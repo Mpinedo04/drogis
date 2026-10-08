@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Neurotolerancia · visualizador de tolerancia y neuroquímica</title>
+  <meta name="description" content="Visualizador interactivo de cómo el cerebro se acostumbra a 11 sustancias: línea de costumbre, placer neto, abstinencia, farmacocinética y neuroquímica, en modo básico, principiante y profesional.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <header class="cabecera">
+    <div class="marca">
+      <span class="marca-logo" aria-hidden="true">Δ</span>
+      <div><strong>Neurotolerancia</strong><span class="lema">Cómo se acostumbra el cerebro a cada sustancia</span></div>
+    </div>
+    <div class="modos" role="tablist" aria-label="Nivel de detalle">
+      <button role="tab" data-modo="basico" aria-selected="true">Básico</button>
+      <button role="tab" data-modo="principiante" aria-selected="false">Principiante</button>
+      <button role="tab" data-modo="profesional" aria-selected="false">Profesional</button>
+    </div>
+    <button class="btn-icono" id="btn-tema" type="button" aria-label="Cambiar tema" title="Tema: automático">◐</button>
+  </header>
+
+  <nav id="tabla" class="tabla" aria-label="Sustancias"></nav>
+  <main id="vista" aria-live="polite"></main>
+
+  <footer class="pie">
+    <div class="caja">
+      <div>
+        <b>Aviso.</b> Herramienta educativa y de reducción de riesgos. No es consejo médico ni una guía de consumo. Los modelos simplifican procesos muy complejos y varían mucho entre personas. Los parámetros farmacocinéticos proceden de la literatura citada; los farmacodinámicos (tolerancia, procesos oponentes) están calibrados para reproducir los cursos temporales descritos, no ajustados a datos individuales.
+      </div>
+      <div>
+        <b>Si necesitas ayuda (España).</b> Emergencias: <b>112</b>. Instituto Nacional de Toxicología: <b>91 562 04 20</b>. Conducta suicida: <b>024</b>. Información y análisis de sustancias: Energy Control. En otros países, usa tu número de emergencias local.
+      </div>
+      <div>
+        <b>Cómo leer las gráficas.</b> «Aporte»: efecto de la pauta en alguien sin adaptación (100 %). «Línea de costumbre»: cuánto de ese efecto se ha comido el cerebro adaptándose. La diferencia es el efecto neto. Si la costumbre está por encima del nivel natural cuando no hay sustancia, eso es malestar (abstinencia).
+      </div>
+    </div>
+  </footer>
+
+  <div id="pop" class="pop" role="tooltip"></div>
+
+  <script src="js/nucleo.js"></script>
+  <script src="js/glosario.js"></script>
+  <script src="js/sustancias/nicotina.js"></script>
+  <script src="js/sustancias/psilocibina.js"></script>
+  <script src="js/sustancias/alcohol.js"></script>
+  <script src="js/sustancias/cafeina.js"></script>
+  <script src="js/sustancias/popper.js"></script>
+  <script src="js/sustancias/lsd.js"></script>
+  <script src="js/sustancias/cannabis.js"></script>
+  <script src="js/sustancias/mdma.js"></script>
+  <script src="js/sustancias/cocaina.js"></script>
+  <script src="js/sustancias/opioides.js"></script>
+  <script src="js/sustancias/benzodiacepinas.js"></script>
+  <script src="js/motor.js"></script>
+  <script src="js/graficos.js"></script>
+  <script src="js/sinapsis.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
