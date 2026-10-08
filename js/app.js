@@ -6,6 +6,8 @@
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   const SUS = NT.sustancias.slice().sort((a, b) => a.numero - b.numero);
   const MODOS = ['basico', 'principiante', 'profesional'];
+  const VELOCIDADES = [['0.5', 'Muy lenta · 1 día cada 2 s'], ['1', 'Lenta · 1 día/s'], ['2', '2 días/s'], ['5', '5 días/s'],
+    ['10', '10 días/s'], ['20', '20 días/s'], ['50', 'Rápida · 50 días/s'], ['auto', 'Automática (todo en ≈11 s)']];
 
   const COL = {
     teal: '#1D9E75', tealA: 'rgba(29,158,117,0.30)', coral: '#D85A30', coralA: 'rgba(216,90,48,0.32)',
@@ -18,9 +20,15 @@
 
   const E = {
     sust: null, modo: 'basico', cfg: null, res: null, dia: 0, presetId: null, diaAuto: false,
-    graf: {}, sin: null, hist: 0, vent: 'dia', play: null, log: false, resol: 'horas', vista: 'sustancia',
+    graf: {}, sin: null, hist: 0, vent: 'dia', play: null, velocidad: leerVelocidad(), log: false, resol: 'horas', vista: 'sustancia',
     comp: null, compOcultas: new Set()
   };
+
+  function leerVelocidad() {
+    let v = '5';
+    try { v = localStorage.getItem('nt-velocidad') || '5'; } catch (e) { /* nada */ }
+    return VELOCIDADES.some(x => x[0] === v) ? v : '5';
+  }
 
   // ------------------------------------------------------------------ utilidades
   const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -303,7 +311,9 @@
     // Tiempo
     h += `<div class="pgrupo"><div class="ptit">Tiempo</div>
       ${slider('dia', 'Día seleccionado', E.dia, 0, H - 1, 1, FMT.dia)}
-      <div class="btns"><button class="btn prim" id="b-play">▶ Reproducir</button><button class="btn" id="b-reset">↺ Día 0</button>
+      <div class="ctl"><div class="ctl-cab"><label for="c-velocidad">Velocidad de reproducción</label></div>
+        <select id="c-velocidad">${VELOCIDADES.map(([v, t]) => `<option value="${v}"${String(v) === String(E.velocidad) ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
+      <div class="btns"><button class="btn prim" id="b-play">${E.play ? '❚❚ Pausa' : '▶ Reproducir'}</button><button class="btn" id="b-reset">↺ Día 0</button>
       ${pro ? '<button class="btn" id="b-csv">⤓ CSV</button>' : ''}</div>
       <p class="nota">Consejo: haz clic en cualquier punto del gráfico de largo plazo para saltar a ese día.</p></div>`;
     $('#panel').innerHTML = h;
@@ -358,6 +368,11 @@
       personalizado(); renderPanel(); resimular();
     });
     $('#b-play').addEventListener('click', () => (E.play ? pararPlay() : iniciarPlay()));
+    $('#c-velocidad').addEventListener('change', e => {
+      E.velocidad = e.target.value;
+      try { localStorage.setItem('nt-velocidad', E.velocidad); } catch (err) { /* sin almacenamiento */ }
+      if (E.play) { pararPlay(); iniciarPlay(); }
+    });
     $('#b-reset').addEventListener('click', () => { pararPlay(); fijarDia(0); });
     const csv = $('#b-csv');
     if (csv) csv.addEventListener('click', descargarCSV);
@@ -369,14 +384,19 @@
     if (sl) { sl.value = E.dia; $('#o-dia').textContent = FMT.dia(E.dia); }
     actualizarDia();
   }
+  // Días por segundo; «auto» recorre todo el periodo en unos 11 segundos.
   function iniciarPlay() {
     if (E.dia >= E.cfg.horizonte - 1) fijarDia(0);
     const b = $('#b-play'); if (b) b.textContent = '❚❚ Pausa';
-    const paso = Math.max(1, Math.round(E.cfg.horizonte / 160));
+    const dps = E.velocidad === 'auto' ? Math.max(1, Math.round(E.cfg.horizonte / 160)) * 1000 / 70 : +E.velocidad;
+    const ms = dps <= 20 ? 1000 / dps : 50;
+    const paso = dps <= 20 ? 1 : dps * ms / 1000;
+    let pos = E.dia;
     E.play = setInterval(() => {
       if (E.dia >= E.cfg.horizonte - 1) { pararPlay(); return; }
-      fijarDia(E.dia + paso);
-    }, 70);
+      pos = Math.max(pos, E.dia) + paso;
+      fijarDia(Math.floor(pos));
+    }, ms);
   }
   function pararPlay() {
     if (E.play) clearInterval(E.play);
